@@ -33,8 +33,10 @@ class Game {
           String name;
           String code;
           String capital;
+          int cnt = 0;
 
           while ((name = br_name.readLine()) != null) {
+            if (++cnt >= 3) break;
             code    = br_code.readLine();
             capital = br_capital.readLine();
             countries.add(new Country(name, code, capital));

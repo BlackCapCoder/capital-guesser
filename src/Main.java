@@ -13,6 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.io.FileInputStream;
 import java.io.IOException;
+import javafx.scene.Node;
 
 public class Main extends Application {
   static Game game;
@@ -85,13 +86,12 @@ public class Main extends Application {
     game.answer(answ);
 
     if (game.isDone()) {
+      Stage s = (Stage) ((Node)e.getSource()).getScene().getWindow();
+      onDone(s);
     } else {
       loadLevel();
     }
   }
-
-  // -------------------------
-
 
   public void loadLevel () {
     Country q = game.getCurrentQuestion();
@@ -109,6 +109,29 @@ public class Main extends Application {
     } catch (IOException e) {}
   }
 
-}
 
+  public void onDone (Stage stage) {
+    GridPane p = new GridPane();
+
+    p.setPadding(new Insets(40, 40, 40, 40));
+
+    Label label_gameover = new Label();
+    label_gameover.setFont(new Font("Monospace", 90));
+    label_gameover.setText("Game over!");
+    p.add(label_gameover, 0, 1);
+
+    Label label_info = new Label();
+    label_info.setFont(new Font("Monospace", 50));
+    label_info.setText("Your final score was: " + game.getCorrectCount());
+    p.add(label_info, 0, 2);
+
+    Label label_pressesc = new Label();
+    label_pressesc.setFont(new Font("Monospace", 30));
+    label_pressesc.setText("Press escape to quit");
+    p.add(label_pressesc, 0, 3);
+
+    stage.getScene().setRoot(p);
+  }
+
+}
 
