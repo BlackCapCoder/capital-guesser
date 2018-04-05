@@ -12,6 +12,8 @@ import javafx.scene.input.KeyCode;
 
 public class Main extends Application {
   public static void main (String[] args) {
+    Game g = new Game ();
+    System.exit(0);
     launch(args);
   }
 
