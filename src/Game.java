@@ -33,10 +33,10 @@ class Game {
           String name;
           String code;
           String capital;
-          int cnt = 0;
+          // int cnt = 0;
 
           while ((name = br_name.readLine()) != null) {
-            if (++cnt >= 3) break;
+            // if (++cnt >= 3) break;
             code    = br_code.readLine();
             capital = br_capital.readLine();
             countries.add(new Country(name, code, capital));
@@ -54,7 +54,10 @@ class Game {
   public Country getCurrentQuestion () { return countries.get(0); }
 
   public boolean answer (String capital) {
-    boolean success = capital.equals(getCurrentQuestion().getCapital());
+    String guess = capital.toLowerCase();
+    String answ  = getCurrentQuestion().getCapital().toLowerCase();
+
+    boolean success = guess.equals(answ);
 
     if (success) {
       correctGuesses++;

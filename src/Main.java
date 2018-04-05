@@ -106,6 +106,9 @@ public class Main extends Application {
                           + "Score: " + game.getCorrectCount() + "        "
                           + "Questions left: " + (game.getGuessIndex()+1) + "/" + game.getTotalGuesses()
                           );
+
+      tb_answer.setText("");
+      tb_answer.requestFocus();
     } catch (IOException e) {}
   }
 
