@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 class Game {
-  static String pth_names    = "../names3";
-  static String pth_codes    = "../codes3";
-  static String pth_capitals = "../capitals3";
+  static String pth_names    = "../names";
+  static String pth_codes    = "../codes";
+  static String pth_capitals = "../capitals";
   static String pth_images   = "../imgs/";
 
   private ArrayList<Country> countries;
