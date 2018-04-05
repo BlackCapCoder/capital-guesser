@@ -19,101 +19,114 @@ public class Main extends Application {
   static Game game;
 
   // Controls
-  static GridPane panel;
+  static GridPane intro;
+  static GridPane main;
+
   static Label label_question;
-  static Scene scene;
   static ImageView img_flag;
   static Label label_country;
   static TextField tb_answer;
-  static Button btn_answer;
   static Label label_score;
+  static Label label_index;
+
+  static RadioButton rb_capital;
+  static RadioButton rb_country;
 
 
   public static void main (String[] args) {
-    game = new Game ();
     launch(args);
   }
 
   public void start (Stage s) {
-    panel          = new GridPane();
-    label_question = new Label();
-    img_flag       = new ImageView();
-    label_country  = new Label();
-    tb_answer      = new TextField();
-    btn_answer     = new Button();
-    label_score    = new Label();
+    GridPane main = mkMain ();
+    intro = mkIntro ();
 
-    label_question.setFont (new Font("Monospace", 60));
-    label_question.setText("What's the capital?");
-
-    label_country.setFont (new Font("Monospace", 60));
-
-    label_score.setFont (new Font("Monospace", 40));
-    label_score.setText("0/0");
-
-    tb_answer.setFont (new Font("Monospace", 30));
-    btn_answer.setFont (new Font("Monospace", 30));
-    btn_answer.setText("Submit");
-    btn_answer.setOnAction (this::onClick);
-
-    panel.setPadding(new Insets(40, 40, 40, 40));
-    panel.add(label_question, 0, 1);
-    panel.add(img_flag, 0, 2);
-    panel.add(label_country, 0, 3);
-    panel.add(tb_answer, 0, 4);
-    panel.add(btn_answer, 1, 4);
-    panel.add(label_score, 0, 5);
-
-    Scene scene = new Scene(panel, 1200, 460);
+    Scene scene = new Scene(intro, 1200, 500);
     scene.getStylesheets().add("main.css");
 
     scene.setOnKeyPressed(this::onKeyPressed);
 
     s.setScene(scene);
 
-    loadLevel();
     s.show();
   }
 
-  public void onKeyPressed (KeyEvent e) {
-    if (e.getCode() == KeyCode.ESCAPE)
-      System.exit(0);
+  public GridPane mkIntro () {
+    GridPane p = new GridPane();
+
+    p.setPadding(new Insets(40, 40, 40, 40));
+
+    Label label_gameover = new Label();
+    label_gameover.setFont(new Font("Monospace", 80));
+    label_gameover.setText("Welcome to capital guesser!");
+    p.add(label_gameover, 0, 1);
+
+    Label label_info = new Label();
+    label_info.setFont(new Font("Monospace", 45));
+    label_info.setText("Which gamemode would you like to play?");
+    label_info.setPadding(new Insets(50, 0, 30, 0));
+    p.add(label_info, 0, 2);
+
+    // Label label_pressesc = new Label();
+    // label_pressesc.setFont(new Font("Monospace", 30));
+    // label_pressesc.setText("Click start to play");
+    // p.add(label_pressesc, 0, 3);
+
+    ToggleGroup g = new ToggleGroup();
+    rb_capital = new RadioButton ("Guess the capital");
+    rb_country = new RadioButton ("Guess the country");
+    rb_capital.setFont (new Font("Monospace", 40));
+    rb_country.setFont (new Font("Monospace", 40));
+    rb_capital.setSelected(true);
+    rb_capital.setToggleGroup(g);
+    rb_country.setToggleGroup(g);
+    rb_country.setPadding(new Insets(10, 0, 60, 0));
+    p.add(rb_capital, 0, 4);
+    p.add(rb_country, 0, 5);
+
+    Button btn = new Button();
+    btn.setFont (new Font("Monospace", 35));
+    btn.setText("Play");
+    btn.setOnAction (this::onStartClicked);
+    btn.setId("btn-start");
+    p.add(btn, 0, 6);
+
+    return p;
   }
+  public GridPane mkMain () {
+    main           = new GridPane();
+    label_question = new Label();
+    img_flag       = new ImageView();
+    label_country  = new Label();
+    tb_answer      = new TextField();
+    label_score    = new Label();
+    label_index    = new Label();
 
-  public void onClick (ActionEvent e) {
-    Button btn = (Button) e.getSource();
-    String answ = tb_answer.getText();
-    game.answer(answ);
+    label_question.setFont (new Font("Monospace", 80));
+    label_country.setFont (new Font("Monospace", 50));
+    label_score.setFont (new Font("Monospace", 40));
+    label_index.setFont (new Font("Monospace", 40));
 
-    if (game.isDone()) {
-      Stage s = (Stage) ((Node)e.getSource()).getScene().getWindow();
-      onDone(s);
-    } else {
-      loadLevel();
-    }
+    tb_answer.setFont (new Font("Monospace", 30));
+    tb_answer.setOnKeyPressed(this::onTbKeypress);
+
+    Button btn_answer = new Button();
+    btn_answer.setFont (new Font("Monospace", 30));
+    btn_answer.setText("Submit");
+    btn_answer.setOnAction (this::onSubmitClicked);
+
+    main.setPadding(new Insets(40, 40, 40, 40));
+    main.add(label_question, 0, 1);
+    main.add(img_flag, 0, 2);
+    main.add(label_country, 0, 3);
+    main.add(tb_answer, 0, 4);
+    main.add(btn_answer, 1, 4);
+    main.add(label_score, 0, 5);
+    main.add(label_index, 0, 6);
+
+    return main;
   }
-
-  public void loadLevel () {
-    Country q = game.getCurrentQuestion();
-
-    try {
-      FileInputStream inp = new FileInputStream ( "../imgs/" + q.getCode() + ".png");
-      Image img = new Image (inp);
-      img_flag.setImage(img);
-
-      label_country.setText(q.getName() + "?");
-      label_score.setText ( ""
-                          + "Score: " + game.getCorrectCount() + "        "
-                          + "Questions left: " + (game.getGuessIndex()+1) + "/" + game.getTotalGuesses()
-                          );
-
-      tb_answer.setText("");
-      tb_answer.requestFocus();
-    } catch (IOException e) {}
-  }
-
-
-  public void onDone (Stage stage) {
+  public GridPane mkOutro () {
     GridPane p = new GridPane();
 
     p.setPadding(new Insets(40, 40, 40, 40));
@@ -133,7 +146,80 @@ public class Main extends Application {
     label_pressesc.setText("Press escape to quit");
     p.add(label_pressesc, 0, 3);
 
-    stage.getScene().setRoot(p);
+    return p;
+  }
+
+
+  // --------------
+
+
+  public void onKeyPressed (KeyEvent e) {
+    if (e.getCode() == KeyCode.ESCAPE)
+      System.exit(0);
+  }
+
+  public void onTbKeypress (KeyEvent e) {
+    if (e.getCode() != KeyCode.ENTER) return;
+    Stage s = (Stage) ((Node)e.getSource()).getScene().getWindow();
+    submit(s);
+  }
+  public void onSubmitClicked (ActionEvent e) {
+    Stage s = (Stage) ((Node)e.getSource()).getScene().getWindow();
+    submit(s);
+  }
+
+  public void onStartClicked (ActionEvent e) {
+    Game.GameMode gm = Game.GameMode.Capital;
+
+    if (rb_capital.isSelected()) gm = Game.GameMode.Capital;
+    if (rb_country.isSelected()) gm = Game.GameMode.Country;
+
+    game = new Game (gm);
+    loadLevel();
+
+    Stage s = (Stage) ((Node)e.getSource()).getScene().getWindow();
+    s.getScene().setRoot(main);
+  }
+
+  public void onGameDone (Stage stage) {
+    GridPane outro = mkOutro ();
+    stage.getScene().setRoot(outro);
+  }
+
+
+  // --------------
+
+
+  public void loadLevel () {
+    Country q = game.getCurrentQuestion();
+
+    try {
+      FileInputStream inp = new FileInputStream ( Game.pth_images + q.getCode() + ".png");
+      Image img = new Image (inp);
+      img_flag.setImage(img);
+
+      label_country.setText(game.getHintString());
+      label_score.setText ( "Score: " + game.getCorrectCount() );
+      label_index.setText ("Questions left: " + (game.getGuessIndex()+1) + "/" + game.getTotalGuesses());
+
+      tb_answer.setText("");
+      tb_answer.requestFocus();
+
+      label_question.setText(game.getGameModeString());
+    } catch (IOException e) {}
+  }
+
+  public void submit (Stage s) {
+    String answ = tb_answer.getText();
+
+    if (answ.trim().equals("")) return;
+    game.answer(answ);
+
+    if (game.isDone()) {
+      onGameDone(s);
+    } else {
+      loadLevel();
+    }
   }
 
 }
