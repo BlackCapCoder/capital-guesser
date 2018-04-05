@@ -3,6 +3,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 class Game {
   static String pth_names    = "../names";
@@ -10,11 +11,14 @@ class Game {
   static String pth_capitals = "../capitals";
 
   private ArrayList<Country> countries;
+  private int correctGuesses;
+  private int wrongGuesses;
+  private int totalGuesses;
 
   Game () {
-    // FileInputStream s = new FileInputStream ("");
-
     loadData();
+    Collections.shuffle(countries);
+    totalGuesses = countries.size();
 
     for (Country c : countries) {
       System.out.println(c.toString());
@@ -41,4 +45,25 @@ class Game {
     } catch (IOException e) {}
   }
 
+  public int getCorrectCount () { return correctGuesses; }
+  public int getWrongCount   () { return wrongGuesses; }
+  public int getGuessIndex   () { return totalGuesses; }
+  public int getGuessesLeft  () { return countries.size(); }
+  public Country getCurrentQuestion () { return countries.get(0); }
+
+  public boolean answer (String capital) {
+    boolean success = capital.equals(getCurrentQuestion().getCapital());
+
+    if (success) {
+      correctGuesses++;
+    } else {
+      wrongGuesses++;
+    }
+
+    countries.remove(0);
+
+    return success;
+  }
+
+  public boolean isDone () { return countries.size() == 0; }
 }
