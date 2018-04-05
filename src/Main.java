@@ -9,33 +9,104 @@ import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.KeyCode;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public class Main extends Application {
-  public static void main (String[] args) {
-    // FileInputStream s = new FileInputStream ("");
+  static Game game;
 
-    Game g = new Game ();
-    System.exit(0);
+  // Controls
+  static GridPane panel;
+  static Label label_question;
+  static Scene scene;
+  static ImageView img_flag;
+  static Label label_country;
+  static TextField tb_answer;
+  static Button btn_answer;
+  static Label label_score;
+
+
+  public static void main (String[] args) {
+    game = new Game ();
     launch(args);
   }
 
   public void start (Stage s) {
-    GridPane panel = new GridPane();
+    panel          = new GridPane();
+    label_question = new Label();
+    img_flag       = new ImageView();
+    label_country  = new Label();
+    tb_answer      = new TextField();
+    btn_answer     = new Button();
+    label_score    = new Label();
+
+    label_question.setFont (new Font("Monospace", 60));
+    label_question.setText("What's the capital?");
+
+    label_country.setFont (new Font("Monospace", 60));
+
+    label_score.setFont (new Font("Monospace", 40));
+    label_score.setText("0/0");
+
+    tb_answer.setFont (new Font("Monospace", 30));
+    btn_answer.setFont (new Font("Monospace", 30));
+    btn_answer.setText("Submit");
+    btn_answer.setOnAction (this::onClick);
 
     panel.setPadding(new Insets(40, 40, 40, 40));
+    panel.add(label_question, 0, 1);
+    panel.add(img_flag, 0, 2);
+    panel.add(label_country, 0, 3);
+    panel.add(tb_answer, 0, 4);
+    panel.add(btn_answer, 1, 4);
+    panel.add(label_score, 0, 5);
 
-    Scene scene = new Scene(panel, 800, 500);
+    Scene scene = new Scene(panel, 1200, 460);
     scene.getStylesheets().add("main.css");
 
     scene.setOnKeyPressed(this::onKeyPressed);
 
     s.setScene(scene);
+
+    loadLevel();
     s.show();
   }
 
   public void onKeyPressed (KeyEvent e) {
     if (e.getCode() == KeyCode.ESCAPE)
       System.exit(0);
+  }
+
+  public void onClick (ActionEvent e) {
+    Button btn = (Button) e.getSource();
+    String answ = tb_answer.getText();
+    game.answer(answ);
+
+    if (game.isDone()) {
+    } else {
+      loadLevel();
+    }
+  }
+
+  // -------------------------
+
+
+  public void loadLevel () {
+    Country q = game.getCurrentQuestion();
+
+    try {
+      FileInputStream inp = new FileInputStream ( "../imgs/" + q.getCode() + ".png");
+      Image img = new Image (inp);
+      img_flag.setImage(img);
+
+      label_country.setText(q.getName() + "?");
+      label_score.setText ( ""
+                          + "Score: " + game.getCorrectCount() + "        "
+                          + "Questions left: " + (game.getGuessIndex()+1) + "/" + game.getTotalGuesses()
+                          );
+    } catch (IOException e) {}
   }
 
 }

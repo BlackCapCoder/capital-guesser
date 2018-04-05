@@ -1,4 +1,3 @@
-import java.io.FileInputStream;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -20,9 +19,9 @@ class Game {
     Collections.shuffle(countries);
     totalGuesses = countries.size();
 
-    for (Country c : countries) {
-      System.out.println(c.toString());
-    }
+    // for (Country c : countries) {
+    //   System.out.println(c.toString());
+    // }
   }
 
   private void loadData () {
@@ -47,7 +46,8 @@ class Game {
 
   public int getCorrectCount () { return correctGuesses; }
   public int getWrongCount   () { return wrongGuesses; }
-  public int getGuessIndex   () { return totalGuesses; }
+  public int getGuessIndex   () { return totalGuesses-getGuessesLeft(); }
+  public int getTotalGuesses () { return totalGuesses; }
   public int getGuessesLeft  () { return countries.size(); }
   public Country getCurrentQuestion () { return countries.get(0); }
 
