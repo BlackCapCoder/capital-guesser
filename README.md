@@ -11,7 +11,7 @@ Mandatory java assignment
 - [ ] Keep track of the time used
 - [ ] Continent game mode
 - [x] Question categories
-- [ ] Language options
+- [x] Language options
 - [x] 3 stages: intro, main, outro
 - [ ] Highscore list
 - [ ] Voice control

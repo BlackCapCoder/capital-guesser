@@ -1,6 +1,8 @@
 * {
   -fx-alignment:center;
+  -fx-background: rgb(16,16,16);
 }
+
 
 #btn-start {
   -fx-padding: 10px 80px;

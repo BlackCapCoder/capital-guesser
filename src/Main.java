@@ -31,6 +31,7 @@ public class Main extends Application {
 
   static RadioButton rb_capital;
   static RadioButton rb_country;
+  static ToggleGroup lang_group;
 
 
   public static void main (String[] args) {
@@ -52,6 +53,7 @@ public class Main extends Application {
   }
 
   public GridPane mkIntro () {
+    int row = 0;
     GridPane p = new GridPane();
 
     p.setPadding(new Insets(40, 40, 40, 40));
@@ -59,18 +61,13 @@ public class Main extends Application {
     Label label_gameover = new Label();
     label_gameover.setFont(new Font("Monospace", 80));
     label_gameover.setText("Welcome to capital guesser!");
-    p.add(label_gameover, 0, 1);
+    p.add(label_gameover, 0, row++);
 
     Label label_info = new Label();
     label_info.setFont(new Font("Monospace", 45));
-    label_info.setText("Which gamemode would you like to play?");
+    label_info.setText("What gamemode would you like to play?");
     label_info.setPadding(new Insets(50, 0, 30, 0));
-    p.add(label_info, 0, 2);
-
-    // Label label_pressesc = new Label();
-    // label_pressesc.setFont(new Font("Monospace", 30));
-    // label_pressesc.setText("Click start to play");
-    // p.add(label_pressesc, 0, 3);
+    p.add(label_info, 0, row++);
 
     ToggleGroup g = new ToggleGroup();
     rb_capital = new RadioButton ("Guess the capital");
@@ -80,16 +77,37 @@ public class Main extends Application {
     rb_capital.setSelected(true);
     rb_capital.setToggleGroup(g);
     rb_country.setToggleGroup(g);
-    rb_country.setPadding(new Insets(10, 0, 60, 0));
-    p.add(rb_capital, 0, 4);
-    p.add(rb_country, 0, 5);
+    rb_country.setPadding(new Insets(10, 0, 0, 0));
+    p.add(rb_capital, 0, row++);
+    p.add(rb_country, 0, row++);
+
+
+    Label label_langs = new Label();
+    label_langs.setFont(new Font("Monospace", 45));
+    label_langs.setText("Choose your language");
+    label_langs.setPadding(new Insets(60, 0, 20, 0));
+    p.add(label_langs, 0, row++);
+
+    lang_group = new ToggleGroup();
+    boolean first = true;
+    RadioButton rb_last = null;
+    for (String lang : game.getLanguageList()) {
+      RadioButton rb = new RadioButton (lang);
+      rb.setFont (new Font("Monospace", 40));
+      rb.setSelected(first);
+      rb.setToggleGroup(lang_group);
+      p.add(rb, 0, row++);
+      rb_last = rb;
+      first = false;
+    }
+    if (rb_last  != null) rb_last.setPadding(new Insets(0, 0, 60, 0));
 
     Button btn = new Button();
     btn.setFont (new Font("Monospace", 35));
     btn.setText("Play");
     btn.setOnAction (this::onStartClicked);
     btn.setId("btn-start");
-    p.add(btn, 0, 6);
+    p.add(btn, 0, row++);
 
     return p;
   }
@@ -174,7 +192,8 @@ public class Main extends Application {
     if (rb_capital.isSelected()) gm = Game.GameMode.Capital;
     if (rb_country.isSelected()) gm = Game.GameMode.Country;
 
-    game = new Game (gm);
+    String l = ((RadioButton) lang_group.getSelectedToggle()).getText().substring(0,2).toLowerCase();
+    game = new Game (gm, l);
     loadLevel();
 
     Stage s = (Stage) ((Node)e.getSource()).getScene().getWindow();
@@ -198,9 +217,11 @@ public class Main extends Application {
       Image img = new Image (inp);
       img_flag.setImage(img);
 
-      label_country.setText(game.getHintString());
-      label_score.setText ( "Score: " + game.getCorrectCount() );
-      label_index.setText ("Questions left: " + (game.getGuessIndex()+1) + "/" + game.getTotalGuesses());
+      String c = game.getHintString();
+      c = c.substring(0,1).toUpperCase() + c.substring(1, c.length() - 2) + c.substring(c.length()-2).toLowerCase();
+      label_country.setText(c);
+      label_score.setText (game.getTrans(2) + ": " + game.getCorrectCount());
+      label_index.setText (game.getTrans(3) + ": " + (game.getGuessIndex()+1) + "/" + game.getTotalGuesses());
 
       tb_answer.setText("");
       tb_answer.requestFocus();

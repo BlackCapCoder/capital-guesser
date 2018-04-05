@@ -6,24 +6,32 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 class Game {
-  static String pth_names    = "../names";
-  static String pth_codes    = "../codes";
-  static String pth_capitals = "../capitals";
   static String pth_images   = "../imgs/";
+  static String pth_data     = "../data/";
+  static String pth_langs    = "langs/";
+  static String pth_langfile = "langfile";
+  static String pth_transfile = "labels";
+  static String pth_names    = "names";
+  static String pth_codes    = "codes";
+  static String pth_capitals = "capitals";
 
   private ArrayList<Country> countries;
   private int correctGuesses;
   private int wrongGuesses;
   private int totalGuesses;
   private GameMode gamemode;
+  private String   language;
+  private ArrayList<String> translation;
 
   public enum GameMode {
     Capital,
     Country
   }
 
-  Game (GameMode gm) {
+  Game (GameMode gm, String lang) {
     gamemode = gm;
+    language = lang;
+    translation = getTranslation();
 
     loadData();
     Collections.shuffle(countries);
@@ -38,9 +46,9 @@ class Game {
     countries = new ArrayList<Country>();
 
     try {
-      BufferedReader br_name = new BufferedReader(new FileReader(pth_names));
-      BufferedReader br_code = new BufferedReader(new FileReader(pth_codes));
-      BufferedReader br_capital = new BufferedReader(new FileReader(pth_capitals));
+      BufferedReader br_code = new BufferedReader(new FileReader(pth_data + pth_codes));
+      BufferedReader br_name = new BufferedReader(new FileReader(pth_data + pth_langs + language + "/" + pth_names));
+      BufferedReader br_capital = new BufferedReader(new FileReader(pth_data + pth_langs + language + "/" + pth_capitals));
 
       String name;
       String code;
@@ -97,9 +105,9 @@ class Game {
   public String getGameModeString () {
     switch (gamemode) {
       case Capital:
-        return "What's the capital?";
+        return getTrans(0);
       case Country:
-        return "Which country is it?";
+        return getTrans(1);
     }
 
     return "";
@@ -114,5 +122,40 @@ class Game {
     }
 
     return "";
+  }
+
+  static ArrayList<String> getLanguageList () {
+    ArrayList<String> ls = new ArrayList<String> ();
+
+    try {
+      BufferedReader br_langfile = new BufferedReader(new FileReader(pth_data + pth_langfile));
+
+      String lang;
+
+      while ((lang = br_langfile.readLine()) != null) {
+        ls.add(lang);
+      }
+    } catch (IOException e) {}
+
+    return ls;
+  }
+
+  private ArrayList<String> getTranslation () {
+    ArrayList<String> ts = new ArrayList<String> ();
+    try {
+      System.out.println(pth_data + pth_langs + language + "/" + pth_langfile);
+      BufferedReader br_langfile = new BufferedReader(new FileReader(pth_data + pth_langs + language + "/" + pth_transfile));
+
+      String lang;
+
+      while ((lang = br_langfile.readLine()) != null) {
+        ts.add(lang);
+      }
+    } catch (IOException e) {}
+    return ts;
+  }
+
+  public String getTrans (int ix) {
+    return translation.get(ix);
   }
 }
