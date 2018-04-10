@@ -15,3 +15,7 @@ Mandatory java assignment
 - [x] 3 stages: intro, main, outro
 - [x] Highscore list
 - [ ] Voice control
+
+### TODO
+
+* Different highscore list for each gamemode
