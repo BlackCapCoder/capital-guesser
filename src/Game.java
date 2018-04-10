@@ -6,14 +6,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 class Game {
-  static String pth_images   = "../imgs/";
-  static String pth_data     = "../data/";
-  static String pth_langs    = "langs/";
-  static String pth_langfile = "langfile";
+  static String pth_images    = "../imgs/";
+  static String pth_data      = "../data/";
+  static String pth_langs     = "langs/";
+  static String pth_langfile  = "langfile";
   static String pth_transfile = "labels";
-  static String pth_names    = "names";
-  static String pth_codes    = "codes";
-  static String pth_capitals = "capitals";
+  static String pth_names     = "names";
+  static String pth_codes     = "codes";
+  static String pth_capitals  = "capitals";
+  static String pth_highscore = "highscore";
 
   private ArrayList<Country> countries;
   private int correctGuesses;
@@ -22,6 +23,8 @@ class Game {
   private GameMode gamemode;
   private String   language;
   private ArrayList<String> translation;
+  private Highscore highscore = new Highscore();
+  private Watch     watch = new Watch ();
 
   public enum GameMode {
     Capital,
@@ -36,18 +39,16 @@ class Game {
     loadData();
     Collections.shuffle(countries);
     totalGuesses = countries.size();
-
-    // for (Country c : countries) {
-    //   System.out.println(c.toString());
-    // }
   }
 
   private void loadData () {
+    highscore.load(pth_data + pth_highscore);
+
     countries = new ArrayList<Country>();
 
     try {
-      BufferedReader br_code = new BufferedReader(new FileReader(pth_data + pth_codes));
-      BufferedReader br_name = new BufferedReader(new FileReader(pth_data + pth_langs + language + "/" + pth_names));
+      BufferedReader br_code    = new BufferedReader(new FileReader(pth_data + pth_codes));
+      BufferedReader br_name    = new BufferedReader(new FileReader(pth_data + pth_langs + language + "/" + pth_names));
       BufferedReader br_capital = new BufferedReader(new FileReader(pth_data + pth_langs + language + "/" + pth_capitals));
 
       String name;
@@ -104,10 +105,8 @@ class Game {
 
   public String getGameModeString () {
     switch (gamemode) {
-      case Capital:
-        return getTrans(0);
-      case Country:
-        return getTrans(1);
+      case Capital: return getTrans(0);
+      case Country: return getTrans(1);
     }
 
     return "";
@@ -142,8 +141,8 @@ class Game {
 
   private ArrayList<String> getTranslation () {
     ArrayList<String> ts = new ArrayList<String> ();
+
     try {
-      System.out.println(pth_data + pth_langs + language + "/" + pth_langfile);
       BufferedReader br_langfile = new BufferedReader(new FileReader(pth_data + pth_langs + language + "/" + pth_transfile));
 
       String lang;
@@ -152,10 +151,27 @@ class Game {
         ts.add(lang);
       }
     } catch (IOException e) {}
+
     return ts;
   }
 
   public String getTrans (int ix) {
     return translation.get(ix);
   }
+
+
+  // ----------
+
+  public void initScore () { watch.start(); }
+  public Highscore calcScore (String name) {
+    watch.stop();
+    long time = watch.getTime();
+    Score s = new Score (correctGuesses, time, name);
+    highscore.addScore(s);
+    return highscore;
+  }
+  public void flushScore () {
+    highscore.save(pth_data + pth_highscore);
+  }
+
 }

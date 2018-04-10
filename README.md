@@ -8,10 +8,10 @@ Mandatory java assignment
 - [ ] Pretty CSS
 - [x] Current question stats
 - [ ] Yell or praise depending on their answer
-- [ ] Keep track of the time used
+- [x] Keep track of the time used
 - [ ] Continent game mode
 - [x] Question categories
 - [x] Language options
 - [x] 3 stages: intro, main, outro
-- [ ] Highscore list
+- [x] Highscore list
 - [ ] Voice control

@@ -26,6 +26,7 @@ public class Main extends Application {
   static ImageView img_flag;
   static Label label_country;
   static TextField tb_answer;
+  static TextField tb_name;
   static Label label_score;
   static Label label_index;
 
@@ -58,10 +59,21 @@ public class Main extends Application {
 
     p.setPadding(new Insets(40, 40, 40, 40));
 
-    Label label_gameover = new Label();
-    label_gameover.setFont(new Font("Monospace", 80));
-    label_gameover.setText("Welcome to capital guesser!");
-    p.add(label_gameover, 0, row++);
+    Label lb_welcome = new Label();
+    lb_welcome.setFont(new Font("Monospace", 80));
+    lb_welcome.setText("Welcome to capital guesser!");
+    lb_welcome.setPadding(new Insets(0, 0, 60, 0));
+    p.add(lb_welcome, 0, row++);
+
+    Label label_name = new Label();
+    label_name.setFont(new Font("Monospace", 45));
+    label_name.setText("Name");
+    p.add(label_name, 0, row++);
+
+    tb_name = new TextField();
+    tb_name.setFont(new Font("Monospace", 40));
+    tb_name.setText("player");
+    p.add(tb_name, 0, row++);
 
     Label label_info = new Label();
     label_info.setFont(new Font("Monospace", 45));
@@ -144,7 +156,7 @@ public class Main extends Application {
 
     return main;
   }
-  public GridPane mkOutro () {
+  public GridPane mkOutro (Highscore hs) {
     GridPane p = new GridPane();
 
     p.setPadding(new Insets(40, 40, 40, 40));
@@ -157,12 +169,25 @@ public class Main extends Application {
     Label label_info = new Label();
     label_info.setFont(new Font("Monospace", 50));
     label_info.setText("Your final score was: " + game.getCorrectCount());
+    label_info.setPadding(new Insets(0, 0, 40, 0));
     p.add(label_info, 0, 2);
 
+    int y = 2;
+    int cnt = 0;
+    for (Score s : hs.getScores()) {
+      if (++cnt > 10) break;
+
+      Label label_pressesc = new Label();
+      label_pressesc.setFont(new Font("Monospace", 30));
+      label_pressesc.setText(cnt + ". " + s.getName() + ", score: " + s.getScore() + ", time: " + s.getTime());
+      p.add(label_pressesc, 0, ++y);
+    }
+
     Label label_pressesc = new Label();
-    label_pressesc.setFont(new Font("Monospace", 30));
+    label_pressesc.setFont(new Font("Monospace", 40));
     label_pressesc.setText("Press escape to quit");
-    p.add(label_pressesc, 0, 3);
+    label_pressesc.setPadding(new Insets(40, 0, 0, 0));
+    p.add(label_pressesc, 0, ++y);
 
     return p;
   }
@@ -194,6 +219,7 @@ public class Main extends Application {
 
     String l = ((RadioButton) lang_group.getSelectedToggle()).getText().substring(0,2).toLowerCase();
     game = new Game (gm, l);
+    game.initScore();
     loadLevel();
 
     Stage s = (Stage) ((Node)e.getSource()).getScene().getWindow();
@@ -201,7 +227,9 @@ public class Main extends Application {
   }
 
   public void onGameDone (Stage stage) {
-    GridPane outro = mkOutro ();
+    Highscore hs = game.calcScore(tb_name.getText());
+    game.flushScore();
+    GridPane outro = mkOutro (hs);
     stage.getScene().setRoot(outro);
   }
 
